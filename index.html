@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Save Billion LEVEL 2</title>
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+  background: black;
+  color: white;
+  text-align: center;
+}
+
+/* Player */
+#player {
+  width: 60px;
+  height: 60px;
+  background: url('billion.png');
+  background-size: cover;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* Enemy */
+.enemy {
+  width: 60px;
+  height: 60px;
+  background: url('bot.png');
+  background-size: cover;
+  position: absolute;
+  border-radius: 15px;
+  z-index: 2;
+}
+
+/* Info */
+#info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  text-align: left;
+}
+
+/* Credit */
+#credit {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255,255,255,0.4);
+}
+</style>
+</head>
+
+<body>
+
+<h2>🚀 Save Billion LEVEL 2</h2>
+
+<div id="info">
+  Score: <span id="score">0</span><br>
+  Lives: <span id="lives">3</span><br>
+  Level: <span id="level">1</span>
+</div>
+
+<div id="player"></div>
+
+<p id="credit">Made by Arvi_xo</p>
+
+<!-- Sounds -->
+<audio id="hitSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+<audio id="scoreSound" src="https://www.soundjay.com/button/beep-09.wav"></audio>
+<audio id="gameOverSound" src="https://www.soundjay.com/misc/sounds/fail-buzzer-01.wav"></audio>
+
+<script>
+let player = document.getElementById("player");
+let score = 0;
+let lives = 3;
+
+function movePlayer(e) {
+  let x = e.touches ? e.touches[0].clientX : e.clientX;
+  player.style.left = x + "px";
+}
+document.addEventListener("mousemove", movePlayer);
+document.addEventListener("touchmove", movePlayer);
+
+function createEnemy() {
+  let enemy = document.createElement("div");
+  enemy.classList.add("enemy");
+
+  enemy.style.left = Math.random() * window.innerWidth + "px";
+  enemy.style.top = "0px";
+
+  document.body.appendChild(enemy);
+
+  let fall = setInterval(() => {
+    let top = parseInt(enemy.style.top);
+    enemy.style.top = top + 5 + "px";
+
+    let playerRect = player.getBoundingClientRect();
+    let enemyRect = enemy.getBoundingClientRect();
+
+    // Collision
+    if (
+      enemyRect.bottom > playerRect.top &&
+      enemyRect.left < playerRect.right &&
+      enemyRect.right > playerRect.left
+    ) {
+      lives--;
+      document.getElementById("lives").innerText = lives;
+
+      document.getElementById("hitSound").play();
+
+      enemy.remove();
+      clearInterval(fall);
+
+      if (lives <= 0) {
+        document.getElementById("gameOverSound").play();
+        setTimeout(() => {
+          alert("Game Over 😢");
+          location.reload();
+        }, 500);
+      }
+    }
+
+    // Missed enemy (score)
+    if (top > window.innerHeight) {
+      score++;
+      document.getElementById("score").innerText = score;
+
+      document.getElementById("scoreSound").play();
+
+      enemy.remove();
+      clearInterval(fall);
+    }
+
+  }, 30);
+}
+
+setInterval(createEnemy, 1000);
+</script>
+
+</body>
+</html>
